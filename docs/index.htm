@@ -1,0 +1,258 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta charset="utf-8" />
+   <title>HspGradator</title>
+   <link rel="StyleSheet" type="text/css" href="style.css" />
+</head>
+<body>
+   <h1>
+      HspGradator
+   </h1>
+   <p>
+      Image gradation allows the adaption and optimization of images using color models and mathematical curves, so-called gradation curves.
+      HspGradator implements HSP, a new color model which incorporates the perceived brightness.
+      The gradation curves are modelled with finite splines, also a new technique, which takes an intermediate position between line segments and cubic splines.
+      Other color models like HSL or CIE-HCL and other types of gradation curves like cubic splines are also available.
+      The result can be analyzed by interpretation of histograms.
+      HspGradator is open source software and the project is hosted on GitHub.
+   </p>
+   <p>
+      During the image gradation the following steps are performed for each pixel of an image:
+      <ul>
+         <li>The color of the pixel, which is given in the RGB format, is converted to the selected color model format</li>
+         <li>The three color parameter values are individually mapped to the respective gradation curves</li>
+         <li>The altered color is converted back to the RGB format</li>
+      </ul>
+   </p>
+   <div class="contents">
+      <ul>
+         <li>Contents</li>
+         <li><a href="#Color Models">Color Models</a></li>
+         <li><a href="#Gradation Curves">Gradation Curves</a></li>
+         <li><a href="#Guidance Lines">Guidance Lines</a></li>
+         <li><a href="#Usage Examples">Usage Examples</a></li>
+         <li><a href="#Project">Project</a></li>
+      </ul>
+   </div>
+   <h2 id="Color Models">
+      Color Models
+   </h2>
+   <p>
+      HspGradator provides the following color models: RGB, HSV, HSL, HSG and HSP.
+   </p>
+   <p>
+      For more information about these color models see my project <a href="https://amaurer1.github.io/CmLibDemo/">CmLibDemo</a>.
+   </p>
+   <p>
+      Additionally, HspGradator provides CIE-HCL (Hue, Chroma, Lightness), this color model is based on 
+      <a href="https://en.wikipedia.org/wiki/CIELAB_color_space">CIE-L*a*b*</a>, which itself is based on the 
+      <a href="https://en.wikipedia.org/wiki/CIE_1931_color_space">CIE-XYZ</a> color model.
+      It's important to know, that you can define more colors with CIE-HCL than with RGB.
+      Therefore, the conversion from RGB to CIE-HCL always works fine.
+      But the other way round, you can get an RGB value which lies outside of the displayable range.
+      In order to bring it back into the displayable range, you have to clamp it.
+   </p>
+   <p>
+      The following calculations demonstrate the issues you can get, if clamping occurs during the gradation.
+      The first three steps show a typical gradation process.
+      First you convert the color from RGB to CIE-HCL, then you change the Chroma and the Lightness (this is the actual gradation).
+      Finally you convert back to RGB.
+      The parameters in an RGB value have to lie in the range from 0 to 255, but now two parameters lie outside.
+      In order to get a valid RGB value again, you have to set a parameter below 0 to 0, and a parameter above 255 to 255, this is the clamping.
+      For testing purposes you convert the clamped RGB value to CIE-HCL again, now you see that all parameters differ in comparison to the CIE-HCL value after gradation.
+      Altough you only changed the Chroma and the Lightness during the gradation, after the clamping all three values, even the Hue, are different.
+   </p>
+   <p>
+      <object data="HspGradator/RGB_Clamping_Formula.svg"></object>
+   </p>
+   <p>
+      These calculations exemplify the gradation of the cyan blue tone of the sky in Figure 5 (before) and 8 (after).
+   </p>
+   <h2 id="Gradation Curves">
+      Gradation Curves
+   </h2>
+   <p>
+      To define the gradation curves you normally use interpolation curves, those are curves that pass through a set of given data points.
+      The type of the gradation curve specifies the shape of the curve between the data points.
+      In HspGradator you have the choice between the following types: line segments, cubic splines and finite splines.
+   </p>
+   <p>
+      For more information about these interpolation curves see my project <a href="https://amaurer1.github.io/IcLibDemo/">IcLibDemo</a>.
+   </p>
+   <h2 id="Guidance Lines">
+      Guidance Lines
+   </h2>
+   <p>
+      The guidance lines are created from the colors of the original image, based on the selected color model.
+      They indicate the distributions of the color values.
+      From a mathematical point of view, they are integrals of the histograms.
+      Guidance lines may give valuable hints for the useful course of the gradation curves.
+      Tracing a guidance line with the gradation curve, leads to an even histogram for this certain parameter.
+   </p>
+   <h2 id="Usage Examples">
+      Usage Examples
+   </h2>
+   <h3>
+      Image optimization
+   </h3>
+   <p>
+      Figures 1 an 5 were optimized with the HspGradator using the color models HSL, HSP and CIE-HCL.
+      The aim was to obtain an average perceived brightness of 50% and a higher saturation, while the Hue shouldn't be touched.
+   </p>
+   <p>
+      First I'd like to compare the application of the similarly constructed color models HSL and HSP.
+      Unlike HSL, HSP considers the perceived brightness.
+      Now let's see whether this feature is useful.
+      After a series of experiments, it turned out that the results were usually similar or almost identical.
+      But in some cases there were considerable differencies in the treatment of the colors blue and yellow, as you can see if you compare the Figures 2 with 3 or 6 with 7.
+      Theoretically this is totally reasonable, because blue is the color with the lowest, and yellow is the color with the highest perceived brightness.
+      So HSP performs as expected and provides considerable advantages in certain cases as shown here.
+   </p>
+   <p>
+      Now let's observe how CIE-HCL behaves: after the adjustment of the Lightness the image appears faded.
+      If you increase the Chroma, the result is inconsistent.
+      Some parts of the image seem oversaturated while other parts still appear slightly faded (Figures 4 and 8).
+      The increased saturation also leads to RGB clamping, especially remarkable in the sky part of Figure 8.
+      As a conclusion, I can't see any distinctive advantages in the application of CIE-HCL based on these examples.
+   </p>
+   <p>
+      <figure style="float: left;">
+         <img src="HspGradator/PICT0023_Original.png" title="Original" />
+         <figcaption>Fig. 1: Original</figcaption>
+      </figure>
+      <figure>
+         <img src="HspGradator/PICT0023_HSL_Gradation.png" title="HSL gradation" />
+         <figcaption>Fig. 2: HSL gradation</figcaption>
+      </figure>
+      <figure style="float: left;">
+         <img src="HspGradator/PICT0023_HSP_Gradation.png" title="HSP gradation" />
+         <figcaption>Fig. 3: HSP gradation</figcaption>
+      </figure>
+      <figure>
+         <img src="HspGradator/PICT0023_CIE_HCL_Gradation.png" title="CIE-HCL gradation" />
+         <figcaption>Fig. 4: CIE-HCL gradation</figcaption>
+      </figure>
+   </p>
+   <p>
+      <figure style="float: left;">
+         <img src="HspGradator/PICT0088_Original.png" title="Original" />
+         <figcaption>Fig. 5: Original</figcaption>
+      </figure>
+      <figure>
+         <img src="HspGradator/PICT0088_HSL_Gradation.png" title="HSL gradation" />
+         <figcaption>Fig. 6: HSL gradation</figcaption>
+      </figure>
+      <figure style="float: left;">
+         <img src="HspGradator/PICT0088_HSP_Gradation.png" title="HSP gradation" />
+         <figcaption>Fig. 7: HSP gradation</figcaption>
+      </figure>
+      <figure>
+         <img src="HspGradator/PICT0088_CIE_HCL_Gradation.png" title="CIE-HCL gradation" />
+         <figcaption>Fig. 8: CIE-HCL gradation</figcaption>
+      </figure>
+   </p>
+   <h2 id ="Project">
+      Project
+   </h2>
+   <p>
+      The <b>HspGradator</b> project was created with Visual Studio Community 2019 using Visual C++ and MFC.
+   </p>
+   <h3>
+      Libraries
+   </h3>
+   <p>
+      The <b>HspGradator</b> project contains the C++ template libraries <b>Color.h</b>, <b>ColorModels.h</b>, <b>Point.h</b> and <b>InterpolationCurve.h</b> and introduces the C++ template library <b>CieHcl.h</b>.
+   </p>
+   <p>
+      <b>CieHcl.h</b> contains the generic data structure <b>TCieHcl</b> and the respective conversion functions to and from <b>TRgb</b>.
+      The data structure can be instantiated with any data type, but if it's used together with the conversion functions, it must be a floating point type.
+      The conversion functions always operate in the range from 0.0 to 1.0 for each parameter of the involved data structures.
+      The algorithms in this library are based on the conversion formulas from <a href="https://www.easyrgb.com/en/math.php">EasyRGB.com</a>.
+   </p>
+   <p>
+      In the <b>HspGradator</b> project the templates are instantiated with the data type <b>float</b>.
+   </p>
+   <h3>
+      Handling
+   </h3>
+   <p>
+      <figure>
+         <img src="HspGradator/HspGradator.png" title="HspGradator" />
+         <figcaption>Fig. 9: HspGradator</figcaption>
+      </figure>
+   </p>
+   <h4>
+      Main window
+   </h4>
+   <p>
+      The main window provides the following menu commands:
+   </p>
+   <ul>
+      <li>Load and save the image with the commands in the File menu</li>
+      <li>Select a color model in the Color Model menu</li>
+      <li>Select the type of the gradation curves in the Curve Type menu</li>
+      <li>The Options menu contains the options Instant Mode and Allow Clamping</li>
+      <li>The View menu contains view options for the curves and the image</li>
+   </ul>
+   <p>
+      If you activate the Instant Mode, the image calculation proceeds while you move the data point with the mouse, otherwise the image calculation takes place after the mouse move operation.
+   </p>
+   <p>
+      Allow Clamping is only effective if the CIE-HCL model is selected and if a color was clamped.
+      If you activate it, the clamped colors are displayed, otherwise the corresponding pixels are colored black.
+   </p>
+   <h4>
+      Curve views
+   </h4>
+   <p>
+      There are three curve views, one for each color model parameter.
+      You can switch them on and off individually in the View menu.
+      In a curve view you can specify a gradation curve while in the background the guidance line is displayed.
+   </p>
+   <ul>
+      <li>Right mouse click in the empty area adds a data point</li>
+      <li>Right mouse click on a data point removes it</li>
+      <li>Left mouse click on a data point and subsequent dragging moves the data point</li>
+      <li>Ctrl + left mouse click on a data point switches between angular and smooth transition</li>
+      <li>Data points with smooth transitions are displayed in red, those with angular transitions are displayed in green</li>
+      <li>Guidance lines are displayed in darker green</li>
+   </ul>
+   <h4>
+      Image view
+   </h4>
+   <p>
+      The image view displays the original or the modified image by choice.
+      You can switch between them with the respective commands in the View menu, the Left/Right keys or the Enter key.
+      A double click on the image view opens the file dialog for the loading of an image.
+   </p>
+   <h4>
+      Histogram view
+   </h4>
+   <p>
+      The histogram view displays histograms of the red, green, blue and the perceived brightness values.
+   </p>
+   <h3>
+      Download
+   </h3>
+   <p>
+      <a href="HspGradator/HspGradator.exe">Download <b>HspGradator</b></a> (64-Bit executable file)
+   </p>
+   <h3>
+      GitHub
+   </h3>
+   <p>
+      <a href="https://github.com/amaurer1/HspGradator">View project on GitHub</a>
+   </p>
+   <h3>
+      License
+   </h3>
+   <p>
+      <b>HspGradator</b> is distributed under the <a href="https://opensource.org/licenses/GPL-3.0">GPL-3.0 software license</a>.
+   </p>
+   <hr />
+   <p>
+      Copyright © 2020 by Adrian Maurer. All Rights reserved.
+   </p>
+</body>
+</html>
