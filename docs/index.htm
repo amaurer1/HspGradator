@@ -165,7 +165,7 @@
       The <b>HspGradator</b> project contains the C++ template libraries <b>Color.h</b>, <b>ColorModels.h</b>, <b>Point.h</b> and <b>InterpolationCurve.h</b> and introduces the C++ template library <b>CieHcl.h</b>.
    </p>
    <p>
-      <b>CieHcl.h</b> contains the generic data structure <b>TCieHcl</b> and the respective conversion functions to and from <b>TRgb</b>.
+      <b>CieHcl.h</b> contains the generic data structure <b>ama::CieHcl</b> and the respective conversion functions to and from <b>ama::Rgb</b>.
       The data structure can be instantiated with any data type, but if it's used together with the conversion functions, it must be a floating point type.
       The conversion functions always operate in the range from 0.0 to 1.0 for each parameter of the involved data structures.
       The algorithms in this library are based on the conversion formulas from <a href="https://www.easyrgb.com/en/math.php">EasyRGB.com</a>.
