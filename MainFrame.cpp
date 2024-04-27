@@ -228,7 +228,7 @@ CMainFrame::CMainFrame() :
 	modifiedHistogramArray(), 
 	guideArray(), 
 	curveArray(), 
-	pathName(), 
+	imageFilePath(), 
 	filterIndex(0), 
 	colorModel(ColorModel::hsp), 
 	instantMode(true), 
@@ -308,9 +308,9 @@ void CMainFrame::updateColorModelLabels()
 	}
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CMainFrame::updateImagePathStatusText()
+void CMainFrame::updateImageFilePathStatusText()
 {
-	statusBar.SetPaneText(1, !pathName.empty() ? pathName.c_str() : L"Empty");
+	statusBar.SetPaneText(1, !imageFilePath.empty() ? imageFilePath.c_str() : L"Empty");
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CMainFrame::updateImageSizeStatusText()
@@ -632,7 +632,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 			// Update
 			updateColorModelMenu();
 			updateColorModelLabels();
-			updateImagePathStatusText();
+			updateImageFilePathStatusText();
 			updateImageSizeStatusText();
 			updateCurveTypeStatusText();
 			updateImageModeStatusText();
@@ -707,8 +707,8 @@ void CMainFrame::OnFileLoadImage()
 	ofn.nFilterIndex = 5;
 	if (dlg.DoModal() == IDOK)
 	{
-		pathName = dlg.GetPathName().GetString();
-		if (filterIndex = getFilterIndex(pathName); filterIndex > 0)
+		imageFilePath = dlg.GetPathName().GetString();
+		if (filterIndex = getFilterIndex(imageFilePath); filterIndex > 0)
 		{
 			auto destroyImages = [this]()
 			{
@@ -721,9 +721,9 @@ void CMainFrame::OnFileLoadImage()
 			};
 			auto updateEmpty = [this]()
 			{
-				pathName.clear();
+				imageFilePath.clear();
 				filterIndex = 0;
-				updateImagePathStatusText();
+				updateImageFilePathStatusText();
 				updateImageSizeStatusText();
 				refreshCurveViews();
 				p_imageView->refresh();
@@ -731,7 +731,7 @@ void CMainFrame::OnFileLoadImage()
 			};
 			::AfxGetApp()->DoWaitCursor(1);
 			image.Destroy();
-			if (const int b = image.load(pathName.c_str()); b == 24)
+			if (const int b = image.load(imageFilePath.c_str()); b == 24)
 			{
 				if (const CSize is(image.getSize()); is.cx > 1 && is.cy > 1)
 				{
@@ -739,13 +739,13 @@ void CMainFrame::OnFileLoadImage()
 					auto calcNewSize = [&is]()
 					{
 						const CSize ds(
-							::GetSystemMetrics(SM_CXSCREEN) / 3 * 2, 
-							::GetSystemMetrics(SM_CYSCREEN) / 3 * 2);
-						const float isr = is.cy / static_cast<float>(is.cx);
-						const float nsr = ds.cy / static_cast<float>(ds.cx);
-						const CSize ns = isr < nsr ? 
-							CSize(ds.cx, static_cast<LONG>(ds.cx * isr)) : 
-							CSize(static_cast<LONG>(ds.cy / isr), ds.cy);
+							::GetSystemMetrics(SM_CXSCREEN) * 2 / 3, 
+							::GetSystemMetrics(SM_CYSCREEN) * 2 / 3);
+						const float iar = is.cx / static_cast<float>(is.cy);
+						const float nar = ds.cx / static_cast<float>(ds.cy);
+						const CSize ns = iar < nar ? 
+							CSize(static_cast<LONG>(ds.cy * iar), ds.cy) : 
+							CSize(ds.cx, static_cast<LONG>(ds.cx / iar));
 						return CSize((std::min)(is.cx, ns.cx), (std::min)(is.cy, ns.cy));
 					};
 					const CSize ns(calcNewSize());
@@ -766,9 +766,9 @@ void CMainFrame::OnFileLoadImage()
 					originalHistogramArray.init(originalImage);
 					modifiedHistogramArray.init(modifiedImage);
 					::AfxGetApp()->DoWaitCursor(-1);
-					updateImagePathStatusText();
+					updateImageFilePathStatusText();
 					updateImageSizeStatusText();
-					pathName = removeImgExt(pathName);
+					imageFilePath = removeImgExt(imageFilePath);
 					p_imageView->recalcLayout();
 					refreshCurveViews();
 					p_imageView->refresh();
@@ -815,25 +815,25 @@ void CMainFrame::OnFileSaveImageAs()
 			L"JPEG Files (*.jpeg)|*.jpeg||", 
 			nullptr, 0, FALSE);
 		OPENFILENAME& ofn = dlg.GetOFN();
-		wcscpy_s(ofn.lpstrFile, _MAX_FNAME, pathName.c_str());
+		wcscpy_s(ofn.lpstrFile, _MAX_FNAME, imageFilePath.c_str());
 		ofn.nFilterIndex = filterIndex;
 		if (dlg.DoModal() == IDOK)
 		{
 			::AfxGetApp()->DoWaitCursor(1);
 			if (CTrueColorImage ni; ni.create(image.getSize(), image.GetBPP()))
 			{
-				std::filesystem::path pn(removeImgExt(dlg.GetPathName().GetString()));
+				std::filesystem::path fp(removeImgExt(dlg.GetPathName().GetString()));
 				switch (dlg.m_ofn.nFilterIndex)
 				{
-					case 1: pn += L".bmp"; break;
-					case 2: pn += L".png"; break;
-					case 3: pn += L".jpg"; break;
-					case 4: pn += L".jpeg"; break;
+					case 1: fp += L".bmp"; break;
+					case 2: fp += L".png"; break;
+					case 3: fp += L".jpg"; break;
+					case 4: fp += L".jpeg"; break;
 					default: break;
 				}
-				if (std::filesystem::exists(pn))
+				if (std::filesystem::exists(fp))
 				{
-					if (::AfxMessageBox(std::format(L"The file {} already exists.\nDo you want to replace it?", pn.c_str()).data(),
+					if (::AfxMessageBox(std::format(L"The file {} already exists.\nDo you want to replace it?", fp.c_str()).data(),
 						MB_YESNO | MB_ICONEXCLAMATION | MB_DEFBUTTON2) == IDNO)
 					{
 						::AfxGetApp()->DoWaitCursor(-1);
@@ -841,7 +841,7 @@ void CMainFrame::OnFileSaveImageAs()
 					}
 				}
 				calcModifiedImage(image, ni);
-				if (ni.Save(pn.c_str()) != S_OK)
+				if (ni.Save(fp.c_str()) != S_OK)
 				{
 					::AfxGetApp()->DoWaitCursor(-1);
 					::AfxMessageBox(L"Save error");
@@ -980,9 +980,9 @@ LRESULT CMainFrame::OnCurveChanged(WPARAM wParam, LPARAM /*lParam*/)
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // CMainFrame - GLOBAL FUNCTIONS
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-int getFilterIndex(const std::filesystem::path& pn)
+int getFilterIndex(const std::filesystem::path& fp)
 {
-	std::wstring fe(pn.extension());
+	std::wstring fe(fp.extension());
 	std::transform(fe.cbegin(), fe.cend(), fe.begin(), towlower);
 	if (fe == L".bmp") return 1;
 	if (fe == L".png") return 2;
@@ -991,15 +991,15 @@ int getFilterIndex(const std::filesystem::path& pn)
 	return 0;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-std::filesystem::path removeImgExt(const std::filesystem::path& opn)
+std::filesystem::path removeImgExt(const std::filesystem::path& ofp)
 {
-	std::filesystem::path npn(opn);
-	std::wstring fe(npn.extension());
+	std::filesystem::path nfp(ofp);
+	std::wstring fe(nfp.extension());
 	std::transform(fe.cbegin(), fe.cend(), fe.begin(), towlower);
 	if (fe == L".bmp" || fe == L".png" || fe == L".jpg"  || fe == L".jpeg")
 	{
-		npn.replace_extension();
+		nfp.replace_extension();
 	}
-	return npn;
+	return nfp;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

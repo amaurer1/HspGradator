@@ -64,7 +64,7 @@ private:
 	HistogramArray modifiedHistogramArray;
 	std::array<Guide, 3> guideArray;
 	std::array<Curve, 3> curveArray;
-	std::filesystem::path pathName;
+	std::filesystem::path imageFilePath;
 	int filterIndex;
 	ColorModel colorModel;
 	bool instantMode;
@@ -81,7 +81,7 @@ protected:
 private:
 	void updateColorModelMenu();
 	void updateColorModelLabels();
-	void updateImagePathStatusText();
+	void updateImageFilePathStatusText();
 	void updateImageSizeStatusText();
 	void updateCurveTypeStatusText();
 	void updateImageModeStatusText();

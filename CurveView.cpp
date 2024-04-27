@@ -200,12 +200,12 @@ void CCurveView::OnSize(UINT nType, int cx, int cy)
 	contentSize = {cx - 2 * borderSize, cy - 2 * borderSize - textHeight};
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CCurveView::OnLButtonDown(UINT nflags, CPoint point)
+void CCurveView::OnLButtonDown(UINT nflags, CPoint pnt)
 {
 	SetCapture();
 	if (p_curve)
 	{
-		const ama::Rectangle<float> sra(createSelectionRectangle(pIn(point)));
+		const ama::Rectangle<float> sra(createSelectionRectangle(pIn(pnt)));
 		p_selectedDataPoint = p_curve->findDataPoint(sra);
 		if (p_selectedDataPoint)
 		{
@@ -213,10 +213,10 @@ void CCurveView::OnLButtonDown(UINT nflags, CPoint point)
 			refresh();
 		}
 	}
-	CView::OnLButtonDown(nflags, point);
+	CView::OnLButtonDown(nflags, pnt);
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CCurveView::OnLButtonUp(UINT nflags, CPoint point)
+void CCurveView::OnLButtonUp(UINT nflags, CPoint pnt)
 {
 	if (p_curve && p_selectedDataPoint)
 	{
@@ -232,14 +232,14 @@ void CCurveView::OnLButtonUp(UINT nflags, CPoint point)
 	p_selectedDataPoint = nullptr;
 	mouseState = MouseState::none;
 	::ReleaseCapture();
-	CView::OnLButtonUp(nflags, point);
+	CView::OnLButtonUp(nflags, pnt);
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CCurveView::OnLButtonDblClk(UINT nflags, CPoint point)
+void CCurveView::OnLButtonDblClk(UINT nflags, CPoint pnt)
 {
 	if (p_curve && !p_selectedDataPoint)
 	{
-		const ama::Rectangle<float> sra(createSelectionRectangle(pIn(point)));
+		const ama::Rectangle<float> sra(createSelectionRectangle(pIn(pnt)));
 		if (!p_curve->findDataPoint(sra))
 		{
 			// Reset Curve
@@ -249,35 +249,35 @@ void CCurveView::OnLButtonDblClk(UINT nflags, CPoint point)
 			sendMessageToMainWnd(GM_CURVE_CHANGED);
 		}
 	}
-	CView::OnLButtonDblClk(nflags, point);
+	CView::OnLButtonDblClk(nflags, pnt);
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CCurveView::OnRButtonDown(UINT nflags, CPoint point)
+void CCurveView::OnRButtonDown(UINT nflags, CPoint pnt)
 {
 	SetCapture();
 	if (p_curve)
 	{
-		const ama::Rectangle<float> sra(createSelectionRectangle(pIn(point)));
+		const ama::Rectangle<float> sra(createSelectionRectangle(pIn(pnt)));
 		p_selectedDataPoint = p_curve->findDataPoint(sra);
 		if (p_selectedDataPoint) mouseState = MouseState::right;
 	}
-	CView::OnRButtonDown(nflags, point);
+	CView::OnRButtonDown(nflags, pnt);
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CCurveView::OnRButtonUp(UINT nflags, CPoint point)
+void CCurveView::OnRButtonUp(UINT nflags, CPoint pnt)
 {
 	if (p_curve)
 	{
 		if (p_selectedDataPoint)
 		{
-			// Remove point at mouse position
+			// Remove pnt at mouse position
 			p_curve->removeDataPoint(p_selectedDataPoint);
 		}
 		else
 		{
-			// Insert point at mouse position
-			const int x = ama::limit<int>(point.x, contentOrigin.x, contentOrigin.x + contentSize.cx);
-			const int y = ama::limit<int>(point.y, contentOrigin.y, contentOrigin.y + contentSize.cy);
+			// Insert pnt at mouse position
+			const int x = ama::limit<int>(pnt.x, contentOrigin.x, contentOrigin.x + contentSize.cx);
+			const int y = ama::limit<int>(pnt.y, contentOrigin.y, contentOrigin.y + contentSize.cy);
 			p_curve->addDataPoint(pIn(x, y), nflags & MK_CONTROL);
 		}
 		refresh();
@@ -286,16 +286,16 @@ void CCurveView::OnRButtonUp(UINT nflags, CPoint point)
 	p_selectedDataPoint = nullptr;
 	mouseState = MouseState::none;
 	::ReleaseCapture();
-	CView::OnRButtonUp(nflags, point);
+	CView::OnRButtonUp(nflags, pnt);
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CCurveView::OnMouseMove(UINT nflags, CPoint point)
+void CCurveView::OnMouseMove(UINT nflags, CPoint pnt)
 {
 	static CPoint prevPoint;
 	if (p_curve && p_selectedDataPoint && mouseState == MouseState::left)
 	{
-		// Move data point
-		const ama::Point<float> dp(pIn(point) - pIn(prevPoint)); // Difference point
+		// Move data pnt
+		const ama::Point<float> dp(pIn(pnt) - pIn(prevPoint)); // Difference pnt
 		p_selectedDataPoint->x = ama::limit(p_selectedDataPoint->x + dp.x, 0.0F, 1.0F);
 		p_selectedDataPoint->y = ama::limit(p_selectedDataPoint->y + dp.y, 0.0F, 1.0F);
 		p_curve->limitDataPointPosition(p_selectedDataPoint);
@@ -303,7 +303,7 @@ void CCurveView::OnMouseMove(UINT nflags, CPoint point)
 		refresh();
 		sendMessageToMainWnd(GM_CURVE_CHANGED, 1U);
 	}
-	prevPoint = point;
-	CView::OnMouseMove(nflags, point);
+	prevPoint = pnt;
+	CView::OnMouseMove(nflags, pnt);
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

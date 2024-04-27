@@ -125,9 +125,9 @@ BOOL CTrueColorImage::create(const CSize& s, const int b)
 	return TRUE;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-int CTrueColorImage::load(LPCTSTR pn)
+int CTrueColorImage::load(LPCTSTR fp)
 {
-	if (Load(pn) == S_OK)
+	if (Load(fp) == S_OK)
 	{
 		if (GetBPP() == 8)
 		{
@@ -222,6 +222,29 @@ void CTrueColorImage::setPixel(const int x, const int y, const ama::AlphaColor<d
 	p_p[3] = ama::round<BYTE>(c.alpha * f);
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CTrueColorImage::readStream(std::istream& is)
+{
+	UINT s = 0;
+	is.read(reinterpret_cast<char*>(&s), sizeof(UINT));
+	if (s > 0)
+	{
+		if (HGLOBAL h_g = ::GlobalAlloc(GMEM_MOVEABLE, static_cast<SIZE_T>(s)))
+		{
+			if (BYTE* const p_b = static_cast<BYTE*>(::GlobalLock(h_g)))
+			{
+				is.read(reinterpret_cast<char*>(p_b), sizeof(BYTE) * s);
+				::GlobalUnlock(h_g);
+				if (IStream* p_s{}; ::CreateStreamOnHGlobal(h_g, TRUE, &p_s) == S_OK)
+				{
+					Load(p_s);
+					p_s->Release();
+				}
+			}
+			::GlobalFree(h_g);
+		}
+	}
+}
+//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CTrueColorImage::writeStream(std::ostream& os) const
 {
 	if (!IsNull())
@@ -249,29 +272,6 @@ void CTrueColorImage::writeStream(std::ostream& os) const
 	{
 		const UINT s = 0;
 		os.write(reinterpret_cast<const char*>(&s), sizeof(UINT));
-	}
-}
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CTrueColorImage::readStream(std::istream& is)
-{
-	UINT s = 0;
-	is.read(reinterpret_cast<char*>(&s), sizeof(UINT));
-	if (s > 0)
-	{
-		if (HGLOBAL h_g = ::GlobalAlloc(GMEM_MOVEABLE, static_cast<SIZE_T>(s)))
-		{
-			if (BYTE* const p_b = static_cast<BYTE*>(::GlobalLock(h_g)))
-			{
-				is.read(reinterpret_cast<char*>(p_b), sizeof(BYTE) * s);
-				::GlobalUnlock(h_g);
-				if (IStream* p_s{}; ::CreateStreamOnHGlobal(h_g, TRUE, &p_s) == S_OK)
-				{
-					Load(p_s);
-					p_s->Release();
-				}
-			}
-			::GlobalFree(h_g);
-		}
 	}
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

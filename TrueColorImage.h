@@ -36,7 +36,7 @@ public:
 	int create(const CSize&, const int);
 	int load(LPCTSTR);
 	CSize getSize() const {return !IsNull() ? CSize(GetWidth(), GetHeight()) : CSize(0, 0);}
-	double calcSizeRatio() const {return !IsNull() ? GetHeight() / static_cast<double>(GetWidth()) : 1.0;}
+	double calcAspectRatio() const {return !IsNull() ? static_cast<double>(GetWidth()) / GetHeight() : 1.0;}
 	template <class T> T getPixel(const int, const int) const;
 	void setPixel(const int, const int, const BYTE);
 	void setPixel(const int, const int, const ama::Color<BYTE>&);
@@ -47,8 +47,8 @@ public:
 	void setPixel(const int, const int, const double);
 	void setPixel(const int, const int, const ama::Color<double>&);
 	void setPixel(const int, const int, const ama::AlphaColor<double, double>&);
-	void writeStream(std::ostream&) const;
 	void readStream(std::istream&);
+	void writeStream(std::ostream&) const;
 };
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // CTrueColorImage - ELEMENT FUNCTIONS

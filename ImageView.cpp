@@ -38,35 +38,19 @@ void CImageView::recalcLayout()
 {
 	if (p_image && !p_image->IsNull())
 	{
-		const float isr = static_cast<float>(p_image->calcSizeRatio());
+		const float iar = static_cast<float>(p_image->calcAspectRatio());
 		const CSize& ws = wndSize;
-		const float wsr = ws.cy / static_cast<float>(ws.cx);
-		const float f = 1.025F;
-		if (isr < 1.0F)
+		const float war = ws.cx / static_cast<float>(ws.cy);
+		constexpr double isf = 0.95; // Image size factor
+		if (iar < war)
 		{
-			if (isr < wsr)
-			{
-				imageSize.cx = ama::round(ws.cx / f);
-				imageSize.cy = ama::round(ws.cx / f * isr);
-			}
-			else
-			{
-				imageSize.cx = ama::round(ws.cy / f / isr);
-				imageSize.cy = ama::round(ws.cy / f);
-			}
+			imageSize.cx = ama::round<int>(ws.cy * isf * iar);
+			imageSize.cy = ama::round<int>(ws.cy * isf);
 		}
 		else
 		{
-			if (isr > wsr)
-			{
-				imageSize.cx = ama::round(ws.cy / f / isr);
-				imageSize.cy = ama::round(ws.cy / f);
-			}
-			else
-			{
-				imageSize.cx = ama::round(ws.cx / f);
-				imageSize.cy = ama::round(ws.cx / f * isr);
-			}
+			imageSize.cx = ama::round<int>(ws.cx * isf);
+			imageSize.cy = ama::round<int>(ws.cx * isf / iar);
 		}
 		imageOrigin.x = ama::round((ws.cx - imageSize.cx) / 2.0F);
 		imageOrigin.y = ama::round((ws.cy - imageSize.cy) / 2.0F);
@@ -131,9 +115,9 @@ void CImageView::OnSize(UINT nType, int cx, int cy)
 	recalcLayout();
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CImageView::OnLButtonDblClk(UINT nFlags, CPoint point)
+void CImageView::OnLButtonDblClk(UINT nFlags, CPoint pnt)
 {
 	sendMessageToMainWnd(WM_COMMAND, ID_FILE_LOAD_IMAGE);
-	CView::OnLButtonDblClk(nFlags, point);
+	CView::OnLButtonDblClk(nFlags, pnt);
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
