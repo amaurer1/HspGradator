@@ -10,7 +10,7 @@
       HspGradator
    </h1>
    <p>
-      Image gradation allows the adaption and optimization of images using color models and mathematical curves, so-called gradation curves.
+      Image gradation allows the adaption and optimization of images using color models and mathematical curves, the so-called gradation curves.
       HspGradator implements HSP, a new color model which incorporates the perceived brightness.
       The gradation curves are modelled with finite splines, also a new technique, which takes an intermediate position between line segments and cubic splines.
       Other color models like HSL or CIE-HCL and other types of gradation curves like cubic splines are also available.
@@ -18,7 +18,7 @@
       HspGradator is open source software and the project is hosted on GitHub.
    </p>
    <p>
-      During the image gradation the following steps are performed for each pixel of an image:
+      During the image gradation the following steps are performed for each pixel of the image:
       <ul>
          <li>The color of the pixel, which is given in the RGB format, is converted to the selected color model format</li>
          <li>The three color parameter values are individually mapped to the respective gradation curves</li>
@@ -44,39 +44,38 @@
    <p>
       For more information about these color models see my project <a href="https://amaurer1.github.io/CmLibDemo/">CmLibDemo</a>.
    </p>
-   <p>
-      Additionally, HspGradator provides CIE-HCL (Hue, Chroma, Lightness), this color model is based on
-      <a href="https://en.wikipedia.org/wiki/CIELAB_color_space">CIE-L*a*b*</a>, which itself is based on the
-      <a href="https://en.wikipedia.org/wiki/CIE_1931_color_space">CIE-XYZ</a> color model.
-      It's important to know, that you can define more colors with CIE-HCL than with RGB.
-      Therefore, the conversion from RGB to CIE-HCL always works fine.
-      But the other way round, you can get an RGB value which lies outside of the displayable range.
-      In order to bring it back into the displayable range, you have to clamp it.
-   </p>
-   <p>
-      The following calculations demonstrate the issues you can get, if clamping occurs during the gradation.
-      The first three steps show a typical gradation process.
-      First you convert the color from RGB to CIE-HCL, then you change the Chroma and the Lightness (this is the actual gradation).
-      Finally you convert back to RGB.
-      The parameters in an RGB value have to lie in the range from 0 to 255, but now two parameters lie outside.
-      In order to get a valid RGB value again, you have to set a parameter below 0 to 0, and a parameter above 255 to 255, this is the clamping.
-      For testing purposes you convert the clamped RGB value to CIE-HCL again, now you see that all parameters differ in comparison to the CIE-HCL value after gradation.
-      Altough you only changed the Chroma and the Lightness during the gradation, after the clamping all three values, even the Hue, are different.
-   </p>
+	<p>
+		Additionally, HspGradator provides CIE-HCL (Hue, Chroma, Lightness), this color model is based on
+		<a href="https://en.wikipedia.org/wiki/CIELAB_color_space">CIE-L*a*b*</a>, which itself is based on the
+		<a href="https://en.wikipedia.org/wiki/CIE_1931_color_space">CIE-XYZ</a> color model.
+		It's important to know, that the CIE-HCL color space contains more colors than the RGB color space.
+		Therefore, the conversion from RGB to CIE-HCL always works fine.
+		But the other way round, some resulting RGB values can lie outside of the displayable range.
+		In order to bring them back into the displayable range, the concerning values have to be clamped.
+	</p>
+	<p>
+		The following calculations demonstrate the issues which can occur, if clamping is executed during the gradation.
+		The first three steps show a typical gradation process.
+		First the color is converted from RGB to CIE-HCL, then the Chroma and the Lightness are changed (this is the actual gradation).
+		Finally, the color is converted back to RGB.
+		The parameters in an RGB value have to lie in the range from 0 to 255, but now two parameters lie outside.
+		In order to get a valid RGB value again, we have to set a parameter below 0 to 0, and a parameter above 255 to 255, this is the clamping.
+		For testing purposes the clamped RGB value is converted to CIE-HCL, now all parameters, even the Hue, differ in comparison to the CIE-HCL value after gradation.
+	</p>
    <p>
       <object data="HspGradator/RGB_Clamping_Formula.svg"></object>
    </p>
    <p>
-      These calculations exemplify the gradation of the cyan blue tone of the sky in Figure 5 (before) and 8 (after).
+      These calculations exemplify the gradation of the cyan tone of the sky in Figure 5 (before) and 8 (after).
    </p>
    <h2 id="Gradation Curves">
       Gradation Curves
    </h2>
-   <p>
-      To define the gradation curves you normally use interpolation curves, those are curves that pass through a set of given data points.
-      The type of the gradation curve specifies the shape of the curve between the data points.
-      In HspGradator you have the choice between the following types: line segments, cubic splines and finite splines.
-   </p>
+	<p>
+		To define the gradation curves usually interpolation curves are used, those are curves that pass through a set of given data points.
+		The type of the gradation curve specifies the shape of the curve between the data points.
+		In HspGradator the following curve styles are available: line segments, cubic splines and finite splines.
+	</p>
    <p>
       For more information about these interpolation curves see my project <a href="https://amaurer1.github.io/IcLibDemo/">IcLibDemo</a>.
    </p>
@@ -84,7 +83,7 @@
       Guidance Lines
    </h2>
    <p>
-      The guidance lines are created from the colors of the original image, based on the selected color model.
+      The guidance lines are created from the colors of the original image by upward sorting, based on the selected color model.
       They indicate the distributions of the color values.
       Guidance lines may give valuable hints for the useful course of the gradation curves.
       Tracing a guidance line with the gradation curve, leads to an even histogram for this certain parameter.
@@ -104,17 +103,17 @@
       Unlike HSL, HSP considers the perceived brightness.
       Now let's see whether this feature is useful.
       After a series of experiments, it turned out that the results were usually similar or almost identical.
-      But in some cases there were considerable differencies in the treatment of the colors blue and yellow, as you can see if you compare the Figures 2 with 3 or 6 with 7.
+      But in some cases there were considerable differencies in the treatment of the colors blue and yellow (compare the Figures 2 with 3 or 6 with 7).
       Theoretically this is totally reasonable, because blue is the color with the lowest, and yellow is the color with the highest perceived brightness.
       So HSP performs as expected and provides considerable advantages in certain cases as shown here.
    </p>
-   <p>
-      Now let's observe how CIE-HCL behaves: after the adjustment of the Lightness the image appears faded.
-      If you increase the Chroma, the result is inconsistent.
-      Some parts of the image seem oversaturated while other parts still appear slightly faded (Figures 4 and 8).
-      The increased saturation also leads to RGB clamping, especially remarkable in the sky part of Figure 8.
-      As a conclusion, I can't see any distinctive advantages in the application of CIE-HCL based on these examples.
-   </p>
+	<p>
+		Now let's observe how CIE-HCL behaves: after the adjustment of the Lightness the image appears faded.
+		If the Chroma is increased, the result is inconsistent.
+		Some parts of the image seem oversaturated while other parts still appear slightly faded (Figures 4 and 8).
+		The increased saturation also leads to RGB clamping, especially remarkable in the sky part of Figure 8.
+		Based on these examples there doesnt't seem to be any distinctive advantages in the application of CIE-HCL.
+	</p>
    <p>
       <figure style="float: left;">
          <img src="HspGradator/PICT0023_Original.png" title="Original" />
@@ -197,27 +196,27 @@
       <li>The Options menu contains the options Instant Mode and Allow Clamping</li>
       <li>The View menu contains view options for the curves and the image</li>
    </ul>
-   <p>
-      If you activate the Instant Mode, the image calculation proceeds while you move the data point with the mouse, otherwise the image calculation takes place after the mouse move operation.
-   </p>
+	<p>
+		If the Instant Mode is activated, the image calculation proceeds while the data point are moved by mouse, otherwise the image calculation takes place after the mouse move operation.
+	</p>
    <p>
       Allow Clamping is only effective if the CIE-HCL model is selected and if a color was clamped.
-      If you activate it, the clamped colors are displayed, otherwise the corresponding pixels are colored black.
+      If the option is activated, the clamped colors are displayed, otherwise the corresponding pixels are colored black.
    </p>
    <h4>
       Curve views
    </h4>
-   <p>
-      There are three curve views, one for each color model parameter.
-      You can switch them on and off individually in the View menu.
-      In a curve view you can specify a gradation curve while in the background the guidance line is displayed.
-   </p>
+	<p>
+		There are three curve views, one for each color model parameter.
+		The display of the individual views can be switched on or off in the View menu.
+		The curve view enables the specification of a gradation curve, in the background the guidance line is displayed.
+	</p>
    <ul>
       <li>Right mouse click in the empty area adds a data point</li>
       <li>Right mouse click on a data point removes it</li>
       <li>Left mouse click on a data point and subsequent dragging moves the data point</li>
       <li>Ctrl + left mouse click on a data point switches between angular and smooth transition</li>
-      <li>Data points with smooth transitions are displayed in red, those with angular transitions are displayed in green</li>
+      <li>Data points with smooth transitions are displayed in red, those with angular transitions in green</li>
       <li>Guidance lines are displayed in darker green</li>
    </ul>
    <h4>
@@ -225,7 +224,7 @@
    </h4>
    <p>
       The image view displays the original or the modified image by choice.
-      You can switch between them with the respective commands in the View menu, the Left/Right keys or the Enter key.
+      They can be switched with the respective commands in the View menu, the Left/Right keys or the Enter key.
       A double click on the image view opens the file dialog for the loading of an image.
    </p>
    <h4>
@@ -255,7 +254,7 @@
    </p>
    <hr />
    <p>
-      Copyright © 2022 by Adrian Maurer. All Rights reserved.
+      Copyright © 2024 by Adrian Maurer. All Rights reserved.
    </p>
 </body>
 </html>
