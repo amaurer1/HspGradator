@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // TrueColorImage.cpp
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// Copyright (c) 2023 Adrian Maurer. All rights reserved.
+// Copyright (c) 2019-2024 Adrian Maurer. All rights reserved.
 // Distributed under the MIT software license (http://www.opensource.org/licenses/mit-license.php).
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #include "pch.h"
@@ -145,81 +145,6 @@ int CTrueColorImage::load(LPCTSTR fp)
 		return 0;
 	}
 	return -1;
-}
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CTrueColorImage::setPixel(const int x, const int y, const BYTE c)
-{
-	BYTE* const p_p = getPixelAddress(x, y);
-	p_p[0] = c;
-}
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CTrueColorImage::setPixel(const int x, const int y, const ama::Color<BYTE>& c)
-{
-	BYTE* const p_p = getPixelAddress(x, y);
-	p_p[0] = c.b;
-	p_p[1] = c.g;
-	p_p[2] = c.r;
-}
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CTrueColorImage::setPixel(const int x, const int y, const ama::AlphaColor<BYTE, BYTE>& c)
-{
-	BYTE* const p_p = getPixelAddress(x, y);
-	p_p[0] = c.color.b;
-	p_p[1] = c.color.g;
-	p_p[2] = c.color.r;
-	p_p[3] = c.alpha;
-}
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CTrueColorImage::setPixel(const int x, const int y, const float c)
-{
-	BYTE* const p_p = getPixelAddress(x, y);
-	constexpr float f = 255.0F;
-	p_p[0] = ama::round<BYTE>(c * f);
-}
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CTrueColorImage::setPixel(const int x, const int y, const ama::Color<float>& c)
-{
-	BYTE* const p_p = getPixelAddress(x, y);
-	constexpr float f = 255.0F;
-	p_p[0] = ama::round<BYTE>(c.b * f);
-	p_p[1] = ama::round<BYTE>(c.g * f);
-	p_p[2] = ama::round<BYTE>(c.r * f);
-}
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CTrueColorImage::setPixel(const int x, const int y, const ama::AlphaColor<float, float>& c)
-{
-	BYTE* const p_p = getPixelAddress(x, y);
-	constexpr float f = 255.0F;
-	p_p[0] = ama::round<BYTE>(c.color.b * f);
-	p_p[1] = ama::round<BYTE>(c.color.g * f);
-	p_p[2] = ama::round<BYTE>(c.color.r * f);
-	p_p[3] = ama::round<BYTE>(c.alpha * f);
-}
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CTrueColorImage::setPixel(const int x, const int y, const double c)
-{
-	BYTE* const p_p = getPixelAddress(x, y);
-	constexpr double f = 255.0;
-	p_p[0] = ama::round<BYTE>(c * f);
-}
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CTrueColorImage::setPixel(const int x, const int y, const ama::Color<double>& c)
-{
-	BYTE* const p_p = getPixelAddress(x, y);
-	constexpr double f = 255.0;
-	p_p[0] = ama::round<BYTE>(c.b * f);
-	p_p[1] = ama::round<BYTE>(c.g * f);
-	p_p[2] = ama::round<BYTE>(c.r * f);
-}
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CTrueColorImage::setPixel(const int x, const int y, const ama::AlphaColor<double, double>& c)
-{
-	BYTE* const p_p = getPixelAddress(x, y);
-	constexpr double f = 255.0;
-	p_p[0] = ama::round<BYTE>(c.color.b * f);
-	p_p[1] = ama::round<BYTE>(c.color.g * f);
-	p_p[2] = ama::round<BYTE>(c.color.r * f);
-	p_p[3] = ama::round<BYTE>(c.alpha * f);
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CTrueColorImage::readStream(std::istream& is)

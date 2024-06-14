@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // HistogramView.cpp
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// Copyright (c) 2023 Adrian Maurer. All rights reserved.
+// Copyright (c) 2019-2024 Adrian Maurer. All rights reserved.
 // Distributed under the GPL-3.0 software license (https://opensource.org/licenses/GPL-3.0).
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #include "pch.h"
@@ -124,13 +124,16 @@ void CHistogramView::draw()
 			memoryDc.FillSolidRect(hr.left, hr.bottom, hr.Width(), 1, bc);
 			memoryDc.FillSolidRect(hr.left - 1, hr.top - 1, 1, hr.Height() + 2, bc);
 			memoryDc.FillSolidRect(hr.right, hr.top - 1, 1, hr.Height() + 2, bc);
+			const double wf = 256.0 / hr.Width(); // Width factor
 			for (int j = 0; j < hr.Width(); ++j)
 			{
-				const float v = j / (hr.Width() - 1.0F);
 				if (hr.Height() > 0)
 				{
-					const int t = static_cast<int>((*p_histogramArray)[i].calcValue(v) * hr.Height());
-					memoryDc.FillSolidRect(hr.left + j, hr.bottom - t, 1, t, ca[i]);
+					const int k1 = ama::round((j + 0.0) * wf);
+					const int k2 = ama::round((j + 1.0) * wf);
+					float mh = (*p_histogramArray)[i][k1];
+					for (int k = k1 + 1; k < k2; ++k) mh = (std::max)((*p_histogramArray)[i][k], mh);
+					memoryDc.FillSolidRect(hr.left + j, hr.bottom, 1, static_cast<int>(-mh * hr.Height()), ca[i]);
 				}
 			}
 			memoryDc.SetTextAlign(TA_LEFT | TA_TOP);

@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // AlphaColor.h
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// Copyright (c) 2023 Adrian Maurer. All rights reserved.
+// Copyright (c) 2019-2024 Adrian Maurer. All rights reserved.
 // Distributed under the MIT software license (http://www.opensource.org/licenses/mit-license.php).
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #ifndef AMA_ALPHA_COLOR_H
@@ -11,106 +11,117 @@
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 namespace ama {
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// AlphaColor<T, U>
+// AlphaColor<T, A, C>
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-template <class T, class U = Color<T>>
+template <class T, class A = T, class C = ama::Color<T>>
 class AlphaColor
 {
 // ELEMENT DATA
 public:
-	Color<T> color;
-	U alpha;
+	A alpha;
+	C color;
 
 // CONSTRUCTION / DESTRUCTION / ASSIGNMENT
 public:
-	constexpr AlphaColor() noexcept : color(), alpha() {}
-	constexpr AlphaColor(const T c, const U& a) noexcept : color(c), alpha(a) {}
-	constexpr AlphaColor(const Color<T>& c, const U& a) noexcept : color(c), alpha(a) {}
+	constexpr AlphaColor() noexcept : alpha(), color() {}
+	constexpr AlphaColor(const A& a, const C& c) noexcept : alpha(a), color(c) {}
 
 // ELEMENT FUNCTIONS
 public:
-	constexpr AlphaColor& operator+=(const AlphaColor<T, U>& ac) noexcept {color += ac.color, alpha += ac.alpha; return *this;}
-	constexpr AlphaColor& operator-=(const AlphaColor<T, U>& ac) noexcept {color -= ac.color, alpha -= ac.alpha; return *this;}
-	constexpr AlphaColor& operator*=(const AlphaColor<T, U>& ac) noexcept {color *= ac.color, alpha *= ac.alpha; return *this;}
-	constexpr AlphaColor& operator/=(const AlphaColor<T, U>& ac) noexcept {color /= ac.color, alpha /= ac.alpha; return *this;}
-	constexpr AlphaColor& operator+=(const T v) noexcept {color += v, alpha += v; return *this;}
-	constexpr AlphaColor& operator-=(const T v) noexcept {color -= v, alpha -= v; return *this;}
-	constexpr AlphaColor& operator*=(const T v) noexcept {color *= v, alpha *= v; return *this;}
-	constexpr AlphaColor& operator/=(const T v) noexcept {color /= v, alpha /= v; return *this;}
+	constexpr AlphaColor& operator+=(const AlphaColor<T, A, C>& ac) noexcept {alpha += ac.alpha, color += ac.color; return *this;}
+	constexpr AlphaColor& operator-=(const AlphaColor<T, A, C>& ac) noexcept {alpha -= ac.alpha, color -= ac.color; return *this;}
+	constexpr AlphaColor& operator*=(const AlphaColor<T, A, C>& ac) noexcept {alpha *= ac.alpha, color *= ac.color; return *this;}
+	constexpr AlphaColor& operator/=(const AlphaColor<T, A, C>& ac) noexcept {alpha /= ac.alpha, color /= ac.color; return *this;}
+	constexpr AlphaColor& operator+=(const T v) noexcept {alpha += v, color += v; return *this;}
+	constexpr AlphaColor& operator-=(const T v) noexcept {alpha -= v, color -= v; return *this;}
+	constexpr AlphaColor& operator*=(const T v) noexcept {alpha *= v, color *= v; return *this;}
+	constexpr AlphaColor& operator/=(const T v) noexcept {alpha /= v, color /= v; return *this;}
 };
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// AlphaColor<T> - GOBAL FUNCTIONS
+// AlphaColor<T, A, C> - GOBAL FUNCTIONS
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-template <class T, class U>
-constexpr AlphaColor<T, U> operator+(AlphaColor<T, U> ac1, const AlphaColor<T, U>& ac2) noexcept
+template <class T, class A, class C>
+constexpr AlphaColor<T, A, C> operator+(AlphaColor<T, A, C> ac) noexcept
+{
+	return ac;
+}
+//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+template <class T, class A, class C>
+constexpr AlphaColor<T, A, C> operator-(AlphaColor<T, A, C> ac) noexcept
+{
+	return {-ac.alpha, -ac.color};
+}
+//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+template <class T, class A, class C>
+constexpr AlphaColor<T, A, C> operator+(AlphaColor<T, A, C> ac1, const AlphaColor<T, A, C>& ac2) noexcept
 {
 	return ac1 += ac2;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-template <class T, class U>
-constexpr AlphaColor<T, U> operator-(AlphaColor<T, U> ac1, const AlphaColor<T, U>& ac2) noexcept
+template <class T, class A, class C>
+constexpr AlphaColor<T, A, C> operator-(AlphaColor<T, A, C> ac1, const AlphaColor<T, A, C>& ac2) noexcept
 {
 	return ac1 -= ac2;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-template <class T, class U>
-constexpr AlphaColor<T, U> operator*(AlphaColor<T, U> ac1, const AlphaColor<T, U>& ac2) noexcept
+template <class T, class A, class C>
+constexpr AlphaColor<T, A, C> operator*(AlphaColor<T, A, C> ac1, const AlphaColor<T, A, C>& ac2) noexcept
 {
 	return ac1 *= ac2;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-template <class T, class U>
-constexpr AlphaColor<T, U> operator/(AlphaColor<T, U> ac1, const AlphaColor<T, U>& ac2) noexcept
+template <class T, class A, class C>
+constexpr AlphaColor<T, A, C> operator/(AlphaColor<T, A, C> ac1, const AlphaColor<T, A, C>& ac2) noexcept
 {
 	return ac1 /= ac2;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-template <class T, class U>
-constexpr AlphaColor<T, U> operator+(AlphaColor<T, U> ac, const T& v) noexcept
+template <class T, class A, class C> 
+constexpr AlphaColor<T, A, C> operator+(AlphaColor<T, A, C> ac, const T& v) noexcept
 {
 	return ac += v;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-template <class T, class U>
-constexpr AlphaColor<T, U> operator+(const T& v, AlphaColor<T, U> ac) noexcept
+template <class T, class A, class C> 
+constexpr AlphaColor<T, A, C> operator+(const T& v, AlphaColor<T, A, C> ac) noexcept
 {
 	return ac += v;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-template <class T, class U>
-constexpr AlphaColor<T, U> operator-(AlphaColor<T, U> ac, const T& v) noexcept
+template <class T, class A, class C> 
+constexpr AlphaColor<T, A, C> operator-(AlphaColor<T, A, C> ac, const T& v) noexcept
 {
 	return ac -= v;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-template <class T, class U>
-constexpr AlphaColor<T, U> operator-(const T& v, AlphaColor<T, U> ac) noexcept
+template <class T, class A, class C> 
+constexpr AlphaColor<T, A, C> operator-(const T& v, AlphaColor<T, A, C> ac) noexcept
 {
-	return {v - ac.color, v - ac.alpha};
+	return {v - ac.alpha, v - ac.color};
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-template <class T, class U>
-constexpr AlphaColor<T, U> operator*(AlphaColor<T, U> ac, const T& v) noexcept
-{
-	return ac *= v;
-}
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-template <class T, class U>
-constexpr AlphaColor<T, U> operator*(const T& v, AlphaColor<T, U> ac) noexcept
+template <class T, class A, class C> 
+constexpr AlphaColor<T, A, C> operator*(AlphaColor<T, A, C> ac, const T& v) noexcept
 {
 	return ac *= v;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-template <class T, class U>
-constexpr AlphaColor<T, U> operator/(AlphaColor<T, U> ac, const T& v) noexcept
+template <class T, class A, class C> 
+constexpr AlphaColor<T, A, C> operator*(const T& v, AlphaColor<T, A, C> ac) noexcept
+{
+	return ac *= v;
+}
+//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+template <class T, class A, class C> 
+constexpr AlphaColor<T, A, C> operator/(AlphaColor<T, A, C> ac, const T& v) noexcept
 {
 	return ac /= v;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-template <class T, class U>
-constexpr AlphaColor<T, U> operator/(const T& v, AlphaColor<T, U> ac) noexcept
+template <class T, class A, class C> 
+constexpr AlphaColor<T, A, C> operator/(const T& v, AlphaColor<T, A, C> ac) noexcept
 {
-	return {v / ac.color, v / ac.alpha};
+	return {v / ac.alpha, v / ac.color};
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 } //namespace ama
